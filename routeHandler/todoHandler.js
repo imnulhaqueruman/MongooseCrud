@@ -25,25 +25,83 @@ router.get('/', async(req, res) => {
         }
 
     })
-    // await Todo.find({ status: "active" }, (err, data) => {
-    //         if (err) {
-    //             res.status(500).json({
-    //                 error: "There was a server side error!"
-    //             });
-    //         } else {
-    //             res.status(200).json({
-    //                 result: data,
-    //                 message: "todo was updated successfully"
-    //             });
-    //         }
-    //     })
-    // try catch
-    // try {
-    //     const result = await Todo.find({ status: "active" })
-    //     res.status(200).json({
-    //         result: result,
-    //         message: "todo was updated successfully"
-    //     });
+    // get all active 
+router.get('/actives', async(req, res) => {
+
+        try {
+            const todo = new Todo()
+            const data = await todo.findActive()
+            res.status(200).json({
+                data: data,
+                message: 'Success'
+            })
+        } catch (err) {
+            res.status(200).json({
+                error: err.message
+            })
+        }
+    })
+    // get active with callback 
+router.get('/actives-callback', (req, res) => {
+        const todo = new Todo()
+        todo.findActiveCallBack((err, data) => {
+            res.status(200).json({
+                data: data
+            })
+        })
+
+
+
+
+    })
+    // custom statics methods use for custom function
+router.get('/js', async(req, res) => {
+        try {
+            const data = await Todo.findByJS()
+            res.status(200).json({
+                data: data
+            })
+        } catch (err) {
+            res.status(200).json({
+                error: err.message
+            })
+        }
+
+    })
+    // get todos by query helper custom
+router.get('/lang', async(req, res) => {
+    try {
+        const data = await Todo.find().byLanguage('mongo')
+        res.status(200).json({
+            data: data
+        })
+    } catch (err) {
+        res.status(200).json({
+            error: err.message
+        })
+    }
+
+})
+
+// await Todo.find({ status: "active" }, (err, data) => {
+//         if (err) {
+//             res.status(500).json({
+//                 error: "There was a server side error!"
+//             });
+//         } else {
+//             res.status(200).json({
+//                 result: data,
+//                 message: "todo was updated successfully"
+//             });
+//         }
+//     })
+// try catch
+// try {
+//     const result = await Todo.find({ status: "active" })
+//     res.status(200).json({
+//         result: result,
+//         message: "todo was updated successfully"
+//     });
 
 // } catch (err) {
 //     res.status(500).json({
