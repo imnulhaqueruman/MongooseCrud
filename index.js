@@ -24,6 +24,7 @@ const errorHandler = (err, req, res, next) => {
     }
     res.status(500).json({ error: err })
 }
+app.use(errorHandler);
 
 app.listen(4000, () => {
     console.log('app listening at port 3000')

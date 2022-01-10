@@ -37,7 +37,9 @@ router.post('/login', async(req, res) => {
         if (user) {
             console.log(user.password)
             const isValidPassword = await bcrypt.compare(req.body.password, user.password);
+
             console.log(isValidPassword)
+
             if (!isValidPassword) {
                 res.status(401).json({
                     error: "Authentication failed"
@@ -45,7 +47,9 @@ router.post('/login', async(req, res) => {
             }
             const token = user.generateJWT();
             console.log(token)
-            res.send(token)
+            res.status(200).json({
+                "access_token": token,
+            })
 
             // if (isValidPassword) {
             //     // generate json web token 
@@ -61,7 +65,7 @@ router.post('/login', async(req, res) => {
 
         } else {
             res.status(401).json({
-                error: "Authentications&login failed"
+                error: "Authentication  failed"
             })
         }
 
