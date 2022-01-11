@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const router = express.Router();
 const Todo = require('../models/todoSchema');
+const User = require('../models/user')
 const checkLogin = require('../middlewares/cheklogin');
 
 
@@ -9,8 +10,9 @@ const checkLogin = require('../middlewares/cheklogin');
 router.get('/', checkLogin, async(req, res) => {
         try {
             console.log(req.email)
-            const data = await Todo.find({ status: "active" }).select({
-                    _id: 0,
+            const data = await Todo.find({})
+                .populate('user', "name email -_id")
+                .select({
                     __v: 0,
                     date: 0,
                 }).limit(2)
@@ -128,10 +130,22 @@ router.get('/:id', async(req, res) => {
 })
 
 // post a todo 
-router.post('/', async(req, res) => {
+router.post('/', checkLogin, async(req, res) => {
     try {
-        const NewTodo = await new Todo(req.body)
-        NewTodo.save()
+        const NewTodo = new Todo({
+            ...req.body,
+            user: req._id
+        })
+
+        const todo = await NewTodo.save();
+        await User.updateOne({
+            _id: req._id
+        }, {
+            $push: {
+                todos: todo._id
+            }
+        })
+
         res.status(200).json({
             message: "todo was inserted successfully"
         });

@@ -30,48 +30,63 @@ router.post('/signup', async(req, res) => {
     })
     // login
 router.post('/login', async(req, res) => {
-    console.log(req.body)
-    try {
-        const user = await User.findOne({ email: req.body.email })
-        console.log('user', user)
-        if (user) {
-            console.log(user.password)
-            const isValidPassword = await bcrypt.compare(req.body.password, user.password);
+        console.log(req.body)
+        try {
+            const user = await User.findOne({ email: req.body.email })
+            console.log('user', user)
+            if (user) {
+                console.log(user.password)
+                const isValidPassword = await bcrypt.compare(req.body.password, user.password);
 
-            console.log(isValidPassword)
+                console.log(isValidPassword)
 
-            if (!isValidPassword) {
+                if (!isValidPassword) {
+                    res.status(401).json({
+                        error: "Authentication failed"
+                    })
+                }
+                const token = user.generateJWT();
+                console.log(token)
+                res.status(200).json({
+                    "access_token": token,
+                })
+
+                // if (isValidPassword) {
+                //     // generate json web token 
+                //     const token = jwt.sign({
+                //         username: user[0].userName,
+                //         userId: user[0]._id,
+                //     }, process.env.JWT_Secret, {
+                //         expiresIn: "1h"
+                //     });
+                //     res.send(token)
+
+                //} 
+
+            } else {
                 res.status(401).json({
-                    error: "Authentication failed"
+                    error: "Authentication  failed"
                 })
             }
-            const token = user.generateJWT();
-            console.log(token)
-            res.status(200).json({
-                "access_token": token,
-            })
 
-            // if (isValidPassword) {
-            //     // generate json web token 
-            //     const token = jwt.sign({
-            //         username: user[0].userName,
-            //         userId: user[0]._id,
-            //     }, process.env.JWT_Secret, {
-            //         expiresIn: "1h"
-            //     });
-            //     res.send(token)
-
-            //} 
-
-        } else {
+        } catch (err) {
             res.status(401).json({
-                error: "Authentication  failed"
+                error: "Authentication failed"
             })
         }
-
+    })
+    // get all users 
+router.get('/all', async(req, res) => {
+    try {
+        const users = await User.find({ status: 'active' })
+            .populate('todos');
+        res.status(200).json({
+            data: users,
+            message: "success"
+        })
     } catch (err) {
-        res.status(401).json({
-            error: "Authentication failed"
+        res.status(500).json({
+            message: "There was a server side error"
         })
     }
 })

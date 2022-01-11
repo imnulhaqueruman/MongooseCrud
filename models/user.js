@@ -19,6 +19,14 @@ const UserSchema = new mongoose.Schema({
         required: true,
         minlength: 5,
         maxlength: 1024,
+    },
+    todos: [{
+        type: mongoose.Types.ObjectId,
+        ref: "Todo"
+    }],
+    status: {
+        type: String,
+        enum: ["active", "inactive"]
     }
 
 });
